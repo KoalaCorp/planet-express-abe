@@ -28,8 +28,8 @@ def get_relations_scores(collection, query, scores):
         raise BaseException("Scores are not int")
 
     return json.dumps(mongo_instance.get_relations_scores(collection,
-                                                  queries,
-                                                  scores))
+                                                          queries,
+                                                          scores))
 
 
 if __name__ == '__main__':

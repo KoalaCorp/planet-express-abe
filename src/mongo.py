@@ -9,12 +9,12 @@ class Mongo(object):
     def get_relations(self, collection, query):
         collection = self.database[collection]
         return [doc for doc in
-                collection.find({"tokenized.word": {"$in": query}},
+                collection.find({"tokenized.topics.word": {"$in": query}},
                                 {'_id': False})]
 
     def get_relations_scores(self, collection, queries, scores):
         collection = self.database[collection]
-        iterator_docs = collection.find({"tokenized.word": {"$in": queries}},
+        iterator_docs = collection.find({"tokenized.topics.word": {"$in": queries}},
                                         {'_id': False})
         queries_scores = {
             query: int(score) for query, score in zip(queries, scores)}
@@ -23,9 +23,12 @@ class Mongo(object):
         for doc in iterator_docs:
             enough_score = False
             for querie, score in queries_scores.items():
-                for item in doc['tokenized']:
-                    if item["word"] == querie and item["score"] >= score:
-                        enough_score = True
+                for token_item in doc['tokenized']:
+                    for item in token_item['topics']:
+                        if item["word"] == querie and item["score"] >= score:
+                            enough_score = True
+                            break
+                    if enough_score:
                         break
             if enough_score:
                 docs.append(doc)
@@ -37,12 +40,14 @@ class Mongo(object):
                    (doc2['url'] not in affinities.keys() or
                     (doc2['url'] in affinities.keys() and
                      doc1['url'] not in affinities[doc2['url']].keys())):
-                    if len(doc1['tokenized']) < len(doc2['tokenized']):
-                        tokenized_list1 = doc1['tokenized']
-                        tokenized_list2 = doc2['tokenized']
+                    doc1_flatt = [word for token_item in doc1['tokenized'] for word in token_item['topics']]
+                    doc2_flatt = [word for token_item in doc2['tokenized'] for word in token_item['topics']]
+                    if len(doc1_flatt) < len(doc2_flatt):
+                        tokenized_list1 = doc1_flatt
+                        tokenized_list2 = doc2_flatt
                     else:
-                        tokenized_list1 = doc2['tokenized']
-                        tokenized_list2 = doc1['tokenized']
+                        tokenized_list1 = doc2_flatt
+                        tokenized_list2 = doc1_flatt
                     affinity_words = []
                     for item1 in tokenized_list1:
                         for item2 in tokenized_list2:
@@ -54,7 +59,15 @@ class Mongo(object):
                                                 item1['score'] - item2['score']
                                                 )})
                     if affinity_words:
-                        affinities.setdefault(doc1['url'], {}).setdefault(doc2['url'], affinity_words)
-                        affinities.setdefault(doc2['url'], {}).setdefault(doc1['url'], affinity_words)
+                        affinities.setdefault(doc1['url'],
+                                              {'date_time': doc1['date_time'] if 'date_time' in doc1.keys() else None}).\
+                                   setdefault(doc2['url'],
+                                              {'date_time': doc2['date_time'] if 'date_time' in doc2.keys() else None,
+                                               'affinity_words': affinity_words})
+                        affinities.setdefault(doc2['url'],
+                                              {'date_time': doc2['date_time'] if 'date_time' in doc2.keys() else None}).\
+                                   setdefault(doc1['url'],
+                                              {'date_time': doc1['date_time'] if 'date_time' in doc1.keys() else None,
+                                               'affinity_words': affinity_words})
 
         return affinities
