@@ -71,3 +71,32 @@ class Mongo(object):
                                                'affinity_words': affinity_words})
 
         return affinities
+
+    def get_relations_topics(self, collection, queries, scores):
+        collection = self.database[collection]
+        iterator_docs = collection.find({"tokenized.topics.word": {"$in": queries}},
+                                        {'_id': False})
+        queries_scores = {
+            query: int(score) for query, score in zip(queries, scores)}
+
+        edges_set = set()
+        topics_dict = {}
+        id = 0
+        for doc in iterator_docs:
+            for token in doc['tokenized']:
+                actual_ids = []
+                for topic in token['topics']:
+                    if topic['word'] not in topics_dict.keys():
+                        topics_dict[topic['word']] = {'id': id,
+                                                      'label': topic['word']}
+                        actual_id = id
+                        id += 1
+                    else:
+                        actual_id = topics_dict[topic['word']]['id']
+                    for last_id in actual_ids:
+                        edges_set.add((last_id, actual_id))
+                    actual_ids.append(actual_id)
+
+        edges = [{'from': edge[0], 'to': edge[1]} for edge in edges_set]
+        topics = [val for key, val in topics_dict.items()]
+        return {'topics': topics, 'edges': edges}
