@@ -88,10 +88,12 @@ class Mongo(object):
                 for topic in token['topics']:
                     if topic['word'] not in topics_dict.keys():
                         topics_dict[topic['word']] = {'id': id,
-                                                      'label': topic['word']}
+                                                      'label': topic['word'],
+                                                      'urls': [doc['url']]}
                         actual_id = id
                         id += 1
                     else:
+                        topics_dict[topic['word']]['urls'].append(doc['url'])
                         actual_id = topics_dict[topic['word']]['id']
                     for last_id in actual_ids:
                         edges_set.add((last_id, actual_id))
