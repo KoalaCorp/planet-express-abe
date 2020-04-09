@@ -34,19 +34,20 @@ def get_relations_scores(collection, query, scores):
                                                           scores))
 
 
-@app.route('/api/topics/<collection>/<query>/<scores>', methods=['GET'])
-def get_relations_topics(collection, query, scores):
+@app.route('/api/topics/<collection>/<query>', methods=['GET'])
+def get_relations_topics(collection, query):
     mongo_instance = Mongo(MONGO_DATABASE, MONGO_HOST, MONGO_PORT)
     queries = query.split(",")
-    scores = scores.split(",")
-    if len(queries) != len(scores):
-        raise BaseException("Distinct size of elements")
-    elif not all(isinstance(int(score), int) for score in scores):
-        raise BaseException("Scores are not int")
 
     return json.dumps(mongo_instance.get_relations_topics(collection,
-                                                          queries,
-                                                          scores))
+                                                          queries))
+
+
+@app.route('/api/collections', methods=['GET'])
+def get_collections():
+    mongo_instance = Mongo(MONGO_DATABASE, MONGO_HOST, MONGO_PORT)
+
+    return json.dumps(mongo_instance.get_collections())
 
 
 if __name__ == '__main__':
