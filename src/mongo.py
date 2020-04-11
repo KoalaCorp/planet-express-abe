@@ -72,33 +72,37 @@ class Mongo(object):
 
         return affinities
 
-    def get_relations_topics(self, collection, queries, scores):
+    def get_relations_topics(self, collection, queries):
         collection = self.database[collection]
         iterator_docs = collection.find({"tokenized.topics.word": {"$in": queries}},
                                         {'_id': False})
-        queries_scores = {
-            query: int(score) for query, score in zip(queries, scores)}
-
-        edges_set = set()
+        edges = []
         topics_dict = {}
-        id = 0
+        url_topics = []
         for doc in iterator_docs:
             for token in doc['tokenized']:
-                actual_ids = []
+                url_topics = []
                 for topic in token['topics']:
-                    if topic['word'] not in topics_dict.keys():
-                        topics_dict[topic['word']] = {'id': id,
-                                                      'label': topic['word'],
-                                                      'urls': [doc['url']]}
-                        actual_id = id
-                        id += 1
+                    topic_word = topic['word']
+                    topic_keys = topics_dict.keys()
+                    topic_word_not_in_topic_keys = bool(topic_word not in topic_keys)
+
+                    for url_topic in url_topics:
+                        if url_topic not in topic_keys or topic_word_not_in_topic_keys:
+                            edges.append({'from': topic_word, 'to': url_topic})
+                    url_topics.append(topic_word)
+
+                    if topic_word not in topic_keys:
+                        topics_dict[topic_word] = {'id': topic_word,
+                                                   'label': topic_word,
+                                                   'urls': [doc['url']]}
                     else:
                         topics_dict[topic['word']]['urls'].append(doc['url'])
-                        actual_id = topics_dict[topic['word']]['id']
-                    for last_id in actual_ids:
-                        edges_set.add((last_id, actual_id))
-                    actual_ids.append(actual_id)
 
-        edges = [{'from': edge[0], 'to': edge[1]} for edge in edges_set]
+
+
         topics = [val for key, val in topics_dict.items()]
         return {'topics': topics, 'edges': edges}
+
+    def get_collections(self):
+        return self.database.collection_names()
