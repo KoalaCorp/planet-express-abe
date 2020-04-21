@@ -2,8 +2,9 @@
 import os
 
 # FLASK VARS
-IP_HOST = "0.0.0.0"
-PORT_HOST = 5000
+IP_HOST = os.getenv("IP_HOST", "0.0.0.0")
+DOMAIN = os.getenv("DOMAIN", "localhost")
+PORT_HOST = os.getenv("PORT_HOST", 5000)
 
 MONGO_HOST = os.getenv("MONGO_HOST", "localhost")
 MONGO_PORT = os.getenv("MONGO_PORT", 27017)

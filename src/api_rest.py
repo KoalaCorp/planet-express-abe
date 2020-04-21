@@ -5,7 +5,10 @@ from flask_cors import CORS
 import json
 
 from mongo import Mongo
-from settings import IP_HOST, PORT_HOST, MONGO_HOST, MONGO_PORT, MONGO_DATABASE
+from settings import (IP_HOST, PORT_HOST, MONGO_HOST, MONGO_PORT,
+                      MONGO_DATABASE, DOMAIN)
+
+
 
 
 app = Flask(__name__)
@@ -43,11 +46,21 @@ def get_relations_topics(collection, query):
                                                           queries))
 
 
-@app.route('/api/collections', methods=['GET'])
-def get_collections():
+@app.route('/api/sources', methods=['GET'])
+def get_sources():
     mongo_instance = Mongo(MONGO_DATABASE, MONGO_HOST, MONGO_PORT)
 
-    return json.dumps(mongo_instance.get_collections())
+    json_response = {
+      "links": {
+        "self": "http://{}:{}/sources".format(DOMAIN, PORT_HOST)
+      },
+      "data": mongo_instance.get_sources(),
+      "jsonapi": {
+        "version": "1.0"
+      }
+    }
+
+    return json.dumps(json_response)
 
 
 if __name__ == '__main__':
