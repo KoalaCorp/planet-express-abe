@@ -104,5 +104,20 @@ class Mongo(object):
         topics = [val for key, val in topics_dict.items()]
         return {'topics': topics, 'edges': edges}
 
-    def get_collections(self):
-        return self.database.collection_names()
+    def get_sources(self):
+        collection = self.database['sources']
+        iterator_docs = collection.find({}, {'_id': False})
+        data = [
+            {
+            "type": "collection",
+            "attributes": {
+                "collection": source['id'],
+                "name": source['name']
+                },
+            "links": {
+                "self": source['home']
+                }
+            } for source in iterator_docs
+          ]
+
+        return data
