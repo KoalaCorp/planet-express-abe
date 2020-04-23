@@ -109,13 +109,12 @@ class Mongo(object):
         iterator_docs = collection.find({}, {'_id': False})
         data = [
             {
-            "type": "collection",
-            "attributes": {
-                "collection": source['id'],
-                "name": source['name']
-                },
-            "links": {
-                "self": source['home']
+                "type": "source",
+                "id": source['id'],
+                "attributes": {
+                    "label": source['id'],
+                    "name": source['name'],
+                    "url": source['home']
                 }
             } for source in iterator_docs
           ]
