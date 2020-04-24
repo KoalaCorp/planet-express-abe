@@ -6,44 +6,36 @@ import json
 
 from mongo import Mongo
 from settings import (IP_HOST, PORT_HOST, MONGO_HOST, MONGO_PORT,
-                      MONGO_DATABASE, DOMAIN)
-
-
+                      MONGO_DATABASE, DOMAIN, API_VERSION)
 
 
 app = Flask(__name__)
 CORS(app)
 
+API_BASE_DOMAIN =  "http://{}:{}/api".format(DOMAIN, PORT_HOST)
 
-@app.route('/api/<collection>/<query>', methods=['GET'])
-def get_relations(collection, query):
+
+@app.route('/api/sources/<source_name>/topics/<topics>', methods=['GET'])
+def get_links_topics(source_name, topics):
     mongo_instance = Mongo(MONGO_DATABASE, MONGO_HOST, MONGO_PORT)
-    return json.dumps(mongo_instance.get_relations(collection,
-                                                   query.split(",")))
+    queries = topics.split(",")
+    topics_nodes, links = mongo_instance.get_links_topics(source_name, queries)
+    json_response = {
+        "links": {
+            "self": "{}/sources/{}/topics/{}".format(API_BASE_DOMAIN,
+                                                     source_name,
+                                                     topics)
+        },
+        "data": topics_nodes,
+        "meta": {
+            "links": links
+        },
+        "jsonapi": {
+            "version": API_VERSION
+        }
+    }
 
-
-@app.route('/api/<collection>/<query>/<scores>', methods=['GET'])
-def get_relations_scores(collection, query, scores):
-    mongo_instance = Mongo(MONGO_DATABASE, MONGO_HOST, MONGO_PORT)
-    queries = query.split(",")
-    scores = scores.split(",")
-    if len(queries) != len(scores):
-        raise BaseException("Distinct size of elements")
-    elif not all(isinstance(int(score), int) for score in scores):
-        raise BaseException("Scores are not int")
-
-    return json.dumps(mongo_instance.get_relations_scores(collection,
-                                                          queries,
-                                                          scores))
-
-
-@app.route('/api/topics/<collection>/<query>', methods=['GET'])
-def get_relations_topics(collection, query):
-    mongo_instance = Mongo(MONGO_DATABASE, MONGO_HOST, MONGO_PORT)
-    queries = query.split(",")
-
-    return json.dumps(mongo_instance.get_relations_topics(collection,
-                                                          queries))
+    return json.dumps(json_response)
 
 
 @app.route('/api/sources', methods=['GET'])
@@ -52,11 +44,11 @@ def get_sources():
 
     json_response = {
       "links": {
-        "self": "http://{}:{}/sources".format(DOMAIN, PORT_HOST)
+        "self": "{}/sources".format(API_BASE_DOMAIN)
       },
       "data": mongo_instance.get_sources(),
       "jsonapi": {
-        "version": "1.0"
+        "version": API_VERSION
       }
     }
 
