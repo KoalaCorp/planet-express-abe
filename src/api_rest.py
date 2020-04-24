@@ -54,6 +54,22 @@ def get_sources():
 
     return json.dumps(json_response)
 
+@app.route('/api/sources/<source>', methods=['GET'])
+def get_source(source):
+    mongo_instance = Mongo(MONGO_DATABASE, MONGO_HOST, MONGO_PORT)
+
+    json_response = {
+      "links": {
+        "self": "{}/sources/{}".format(API_BASE_DOMAIN, source)
+      },
+      "data": mongo_instance.get_source(source),
+      "jsonapi": {
+        "version": API_VERSION
+      }
+    }
+
+    return json.dumps(json_response)
+
 
 if __name__ == '__main__':
     app.debug = True
