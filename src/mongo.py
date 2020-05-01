@@ -12,9 +12,10 @@ class Mongo(object):
         collection = self.database[source]
         iterator_docs = collection.find(
             {
-            "tokenized.topics.word": {
-                "$in": queries
-                }
+                "$or": [
+                    {"tokenized.topics.word": {"$in": queries}},
+                    {"tokenized.names.word": {"$in": queries}}
+                ]
             },
             {'_id': False}
         )
