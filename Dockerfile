@@ -6,3 +6,4 @@ ENV MONGO_HOST mongo
 ADD requeriments.txt /requeriments.txt
 RUN pip install -r /requeriments.txt
 ADD src /api
+RUN python populate.py

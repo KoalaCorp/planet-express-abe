@@ -12,3 +12,7 @@ MONGO_DATABASE = os.getenv("MONGO_DATABASE", "planet-express")
 
 
 API_VERSION = "1.0"
+
+
+# Testing
+MONGO_DATABASE_TESTS = os.getenv("MONGO_DATABASE_TESTS", "planet-express-tests")
