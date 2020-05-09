@@ -1,11 +1,9 @@
 # coding=utf-
-import json
-
 from flask import Flask, jsonify
 from flask_cors import CORS
 
 
-from mongo import Mongo, LinksTopicsMongo, SourcesMongo, SourceMongo
+from mongo import LinksTopicsMongo, SourcesMongo, SourceMongo
 from settings import (IP_HOST, PORT_HOST, MONGO_HOST, MONGO_PORT,
                       MONGO_DATABASE, DOMAIN, API_VERSION)
 
