@@ -1,7 +1,7 @@
 # coding=utf-
 import json
 
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 
 
@@ -42,7 +42,7 @@ def get_links_topics(source_name, topics, degrees):
         }
     }
 
-    return json.dumps(json_response)
+    return jsonify(json_response)
 
 
 @app.route('/api/sources', methods=['GET'])
@@ -59,7 +59,7 @@ def get_sources():
       }
     }
 
-    return json.dumps(json_response)
+    return jsonify(json_response)
 
 
 @app.route('/api/sources/<source>', methods=['GET'])
@@ -76,7 +76,7 @@ def get_source(source):
       }
     }
 
-    return json.dumps(json_response)
+    return jsonify(json_response)
 
 
 if __name__ == '__main__':
