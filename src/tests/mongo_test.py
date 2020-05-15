@@ -17,7 +17,8 @@ class LinksTopicsMongoTestCase(unittest.TestCase):
     def setUpClass(cls):
         populate_db_tests()
         cls.mongo_instance = LinksTopicsMongo(MONGO_DATABASE_TESTS,
-                                              MONGO_HOST, MONGO_PORT)
+                                              MONGO_HOST, MONGO_PORT,
+                                              ('topics', 'names'))
         collection = cls.mongo_instance.database[cls.source]
         with open('tests/mongo_test.json') as json_file:
             json_data = json.load(json_file)

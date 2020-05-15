@@ -13,23 +13,28 @@ CORS(app)
 
 API_BASE_DOMAIN = "http://{}:{}/api".format(DOMAIN, PORT_HOST)
 
-
+@app.route('/api/sources/<source_name>/topics/<topics>/degrees/<degrees>/sections/<sections>',
+           methods=['GET'])
 @app.route('/api/sources/<source_name>/topics/<topics>/degrees/<degrees>',
+           defaults={'sections': 'entities'},
            methods=['GET'])
 @app.route('/api/sources/<source_name>/topics/<topics>',
-           defaults={'degrees': 2},
+           defaults={'degrees': 2, 'sections': 'entities'},
            methods=['GET'])
-def get_links_topics(source_name, topics, degrees):
-    mongo_instance = LinksTopicsMongo(MONGO_DATABASE, MONGO_HOST, MONGO_PORT)
+def get_links_topics(source_name, topics, degrees, sections):
+    mongo_instance = LinksTopicsMongo(MONGO_DATABASE, MONGO_HOST, MONGO_PORT,
+                                      sections.split(','))
     queries = topics.split(",")
     topics_nodes, links = mongo_instance.get_links_topics(source_name, queries,
                                                           degrees)
     json_response = {
         "links": {
-            "self": "{}/sources/{}/topics/{}/degrees/{}".format(API_BASE_DOMAIN,
+            "self": "{}/sources/{}/topics/{}/degrees/{}/sections/{}".format(
+                                                                API_BASE_DOMAIN,
                                                                 source_name,
                                                                 topics,
-                                                                degrees)
+                                                                degrees,
+                                                                sections)
         },
         "data": topics_nodes,
         "meta": {
