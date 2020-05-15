@@ -48,7 +48,8 @@ class LinksTopicsMongo(Mongo):
     date_time = "date_time"
     title = "title"
 
-    def __init__(self, database, host, port):
+    def __init__(self, database, host, port, sections):
+        self.sections = sections
         self.links_dict = {}
         self.topics_dict = {}
         self.exclude_ids = []
@@ -91,27 +92,28 @@ class LinksTopicsMongo(Mongo):
             url = self.__doc_to_url(doc, source_data)
             for token in doc['tokenized']:
                 url_topics = []
-                for topic in token['topics'] + token['names']:
-                    topic_word = topic['word']
-                    self.queries.append(topic_word)
-                    for url_topic in url_topics:
-                        sorted_topics_name_list = [url_topic, topic_word]
-                        sorted_topics_name = "_".join(sorted_topics_name_list)
-                        if sorted_topics_name not in self.links_dict.keys():
-                            self.links_dict[sorted_topics_name] =\
-                                self.__doct_to_link__(sorted_topics_name_list,
-                                                      url)
-                        else:
-                            self.links_dict[sorted_topics_name]["urls"]\
-                                .append(url)
-                    url_topics.append(topic_word)
+                for section in self.sections:
+                    for topic in token[section]:
+                        topic_word = topic['word']
+                        self.queries.append(topic_word)
+                        for url_topic in url_topics:
+                            sorted_topics_name_list = [url_topic, topic_word]
+                            sorted_topics_name = "_".join(sorted_topics_name_list)
+                            if sorted_topics_name not in self.links_dict.keys():
+                                self.links_dict[sorted_topics_name] =\
+                                    self.__doct_to_link__(sorted_topics_name_list,
+                                                          url)
+                            else:
+                                self.links_dict[sorted_topics_name]["urls"]\
+                                    .append(url)
+                        url_topics.append(topic_word)
 
-                    if topic_word not in self.topics_dict.keys():
-                        self.topics_dict[topic_word] =\
-                            self.__doc_to_topic__(topic_word, topic['score'])
-                    else:
-                        self.topics_dict[topic['word']]['meta']['counter'] +=\
-                            topic['score']
+                        if topic_word not in self.topics_dict.keys():
+                            self.topics_dict[topic_word] =\
+                                self.__doc_to_topic__(topic_word, topic['score'])
+                        else:
+                            self.topics_dict[topic['word']]['meta']['counter'] +=\
+                                topic['score']
 
     def get_links_topics(self, source, queries, degrees):
         sources_collection = self.database['sources']
@@ -120,16 +122,19 @@ class LinksTopicsMongo(Mongo):
         self.queries = queries
 
         for degree in range(degrees):
+            regex_query = "|".join(self.queries) if len(self.queries) > 1 else self.queries[-1]
+            or_query = [{
+                "tokenized.{}.word".format(tokenized_section): {
+                    "$regex": regex_query,
+                    "$options": "i"
+                }
+            } for tokenized_section in self.sections]
             iterator_docs = collection.find(
                 {
                     "_id": {"$nin": self.exclude_ids},
-                    "$or": [
-                        {"tokenized.topics.word": {"$in": self.queries}},
-                        {"tokenized.names.word": {"$in": self.queries}}
-                    ]
+                    "$or": or_query
                 }
             )
-
             self.__iterate_docs__(iterator_docs, source_data)
 
         links = [val for key, val in self.links_dict.items()]
