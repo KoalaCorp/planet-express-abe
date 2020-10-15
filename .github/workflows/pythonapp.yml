@@ -29,6 +29,7 @@ jobs:
         pip install -r requirements.txt
     - name: Install mongo
       run: |
+        sudo apt update
         sudo apt install mongodb-server -y
     - name: Lint with flake8
       run: |
