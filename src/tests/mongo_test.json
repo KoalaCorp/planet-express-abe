@@ -1,0 +1,87 @@
+[
+  {
+	"url" : "https://elfarodeceuta.es/1",
+	"date_time" : "02/05/2020",
+	"title" : "Data source with ceuta and pp",
+	"content" : "Data source with ceuta and pp",
+	"tokenized" : [
+		{
+			"topics" : [
+				{
+					"word" : "ceuta",
+					"score" : 6
+				}
+      ],
+			"names" : [
+        {
+					"word" : "pp",
+					"score" : 6
+				}
+			]
+		}
+	]},
+  {
+  "url" : "https://elfarodeceuta.es/2",
+  "date_time" : "02/05/2020",
+  "title" : "Data source with pp and vivas",
+  "content" : "Data source with pp and vivas",
+  "tokenized" : [
+    {
+      "topics" : [
+        {
+          "word" : "pp",
+          "score" : 6
+        }
+      ],
+      "names" : [
+        {
+          "word" : "vivas",
+          "score" : 6
+        }
+      ]
+    }
+  ]},
+  {
+	"url" : "https://elfarodeceuta.es/3",
+	"date_time" : "02/05/2020",
+	"title" : "Data source with vivas and ayuntamiento",
+	"content" : "Data source with vivas and ayuntamiento",
+	"tokenized" : [
+		{
+			"topics" : [],
+			"names" : [
+  			{
+  			     "word" : "vivas",
+  			     "score" : 6
+  		  },
+        {
+  			     "word" : "ayuntamiento",
+  			     "score" : 6
+  		  }]
+		}
+	]},
+  {
+	"url" : "https://elfarodeceuta.es/4",
+	"date_time" : "02/05/2020",
+	"title" : "Data source with vivas, ayuntamiento, ceuta",
+	"content" : "Data source with vivas, ayuntamiento, ceuta",
+	"tokenized" : [
+		{
+			"topics" : [
+        {
+  			     "word" : "ceuta",
+  			     "score" : 6
+  		  }
+      ],
+			"names" : [
+  			{
+  			     "word" : "vivas",
+  			     "score" : 6
+  		  },
+        {
+  			     "word" : "ayuntamiento",
+  			     "score" : 6
+  		  }]
+		}
+	]}
+]

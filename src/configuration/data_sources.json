@@ -1,0 +1,27 @@
+[{
+  "id": "elfarodeceuta",
+  "name": "El Faro de Ceuta",
+  "home": "https://elfarodeceuta.es/",
+  "crawler_path": "ceuta/ceuta",
+  "text_type": "text",
+  "crawling": true,
+  "tokenizing": true
+},
+{
+  "id": "elpueblodeceuta",
+  "name": "El pueblo de Ceuta",
+  "home": "https://elpueblodeceuta.es/",
+  "crawler_path": "ceuta/ceuta",
+  "text_type": "text",
+  "crawling": true,
+  "tokenizing": true
+},
+{
+  "id": "bocce",
+  "name": "Boletin Oficial Ciudad De Ceuta",
+  "home": "http://www.ceuta.es/ceuta/bocce",
+  "crawler_path": "ceuta/ceuta",
+  "text_type": "pdf",
+  "crawling": true,
+  "tokenizing": true
+}]
